@@ -13,23 +13,20 @@ function searchMeal(e) {
         fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${term}`)
             .then(res => res.json())
             .then(data => {
-                console.log(data);
-                resultHeading.innerHTML = `<h2 style="color:black;text-shadow: 1px 1px 2px black;">Search results for '${term}':</h2>`;
+                resultHeading.innerHTML = `<h2>Search results for '${term}':</h2>`;
 
                 if (data.meals === null) {
                     resultHeading.innerHTML = `<p>There are no search results. Try again!<p>`;
+                    mealsEl.innerHTML = '';
                 } else {
-                    mealsEl.innerHTML = data.meals
-                        .map(
-                            meal => `
+                    mealsEl.innerHTML = data.meals.map(meal => `
             <div class="meal">
               <img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
               <div class="meal-info" data-mealID="${meal.idMeal}">
                 <h3 style=" background-color: black;">${meal.strMeal}</h3>
               </div>
             </div>
-          `
-                        )
+          `)
                         .join('');
                 }
             });
@@ -38,6 +35,16 @@ function searchMeal(e) {
         alert('Please enter a search term');
     }
 }
+
+function getMealById(mealID) {
+    fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealID}`)
+        .then(res => res.json())
+        .then(data => {
+            const meal = data.meals[0];
+
+            addMealToDOM(meal);
+        });
+};
 
 function getRandomMeal() {
 
@@ -69,7 +76,7 @@ function addMealToDOM(meal) {
   single_mealEl.innerHTML = `
     <div class="single-meal">
       <h1>${meal.strMeal}</h1>
-      <img src="${meal.strMealThumb}" alt="${meal.strMeal}" />
+      <img style="border-radius:20px;" src="${meal.strMealThumb}" alt="${meal.strMeal}" />
       <div class="single-meal-info">
         ${meal.strCategory ? `<p  style="background-color: rgba(0, 0, 0, 0.7);">${meal.strCategory}</p>` : ''}
         ${meal.strArea ? `<p  style="background-color: rgba(0, 0, 0, 0.7);">${meal.strArea}</p>` : ''}
@@ -102,3 +109,4 @@ mealsEl.addEventListener('click', e => {
     getMealById(mealID);
   }
 });
+getRandomMeal();
